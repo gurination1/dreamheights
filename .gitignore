@@ -1,0 +1,4 @@
+debug_screens/
+verify_bathinda_site.py
+capture_orig.py
+*.log
