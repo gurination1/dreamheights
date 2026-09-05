@@ -223,9 +223,25 @@ $$$$$$$$$$                    /////////          �
       .preloader_logo_a .a2, .hero-s_logo_a .a2 {
         font-family: var(--_fonts---font-accent) !important;
       }
+      #cursor-canvas {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        pointer-events: none !important;
+        z-index: 2147483647 !important;
+        mix-blend-mode: difference !important;
+        display: block !important;
+      }
+      @media (min-width: 769px) {
+        html, body, a, button, [role="button"], .btn-circle_link {
+          cursor: none !important;
+        }
+      }
     </style>
 
-</head><body class="body"><div data-barba="wrapper" class="transition-wrapper"><div class="main-css"><div class="style-css w-embed"><style>
+</head><body class="body"><canvas id="cursor-canvas" class="reggae-cursor-canvas js-canvas"></canvas><div data-barba="wrapper" class="transition-wrapper"><div class="main-css"><div class="style-css w-embed"><style>
   :root {
     --dur-s: 0.4s;
     --dur-m: 0.8s;
@@ -2282,7 +2298,7 @@ $$$$$$$$$$                    /////////          �
 <script src="/js/lottie.min.js"></script>
 
 <script type="module" src="/js/slater.js"></script>
-<script src="/js/cursor.js"></script>
+<script src="/js/cursor.js?v=4"></script>
 
 
 

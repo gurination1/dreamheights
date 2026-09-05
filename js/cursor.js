@@ -1,65 +1,21 @@
 /**
  * Interactive Canvas Cursor based on ReGGae (Jesper Landberg - NXqjpo)
- * Features:
  * - Inner center dot (tracks mouse pointer)
  * - Outer concentric follower circle with fluid lerp interpolation (0.22)
- * - mix-blend-mode: difference for automatic high-contrast inversion on dark and light surfaces
- * - Interactive hover expansion on links, buttons, CTAs, tabs, and form elements
- * - Click (mousedown) spring compression feedback
- * - High-DPI (Retina) canvas crispness
- * - Safe mobile deactivation
+ * - mix-blend-mode: difference for automatic high-contrast inversion
+ * - Interactive hover expansion on links, buttons, CTAs, and interactive elements
+ * - Responsive to mouse, pointer, and touch
+ * - High-DPI (Retina) crispness
  */
 
 (function () {
   'use strict';
 
-  function initCursor() {
-    // Guard: Mobile touch screens under 768px
-    if (window.innerWidth <= 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
-      return;
-    }
-
-    // Inject required CSS for clean cursor experience
-    if (!document.getElementById('reggae-cursor-style')) {
-      const style = document.createElement('style');
-      style.id = 'reggae-cursor-style';
-      style.textContent = `
-        .reggae-cursor-canvas {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          pointer-events: none;
-          z-index: 2147483647;
-          mix-blend-mode: difference;
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-        .reggae-cursor-canvas.is-active {
-          opacity: 1;
-        }
-        @media (min-width: 769px) {
-          html, body, a, button, [role="button"], .btn-circle_link, input[type="submit"], input[type="button"] {
-            cursor: none !important;
-          }
-          input[type="text"], input[type="email"], input[type="tel"], textarea {
-            cursor: text !important;
-          }
-        }
-        @media (max-width: 768px) {
-          .reggae-cursor-canvas {
-            display: none !important;
-          }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-
-    // Create or retrieve canvas
-    let canvas = document.querySelector('.reggae-cursor-canvas');
+  function setupCursor() {
+    let canvas = document.getElementById('cursor-canvas');
     if (!canvas) {
       canvas = document.createElement('canvas');
+      canvas.id = 'cursor-canvas';
       canvas.className = 'reggae-cursor-canvas js-canvas';
       document.body.appendChild(canvas);
     }
@@ -82,10 +38,9 @@
     resize();
     window.addEventListener('resize', resize, { passive: true });
 
-    // Cursor state
     let mouseX = width / 2;
     let mouseY = height / 2;
-    let isMouseInside = false;
+    let hasMoved = false;
     let isHovering = false;
 
     const circle = {
@@ -94,8 +49,8 @@
       radius: 14,
       baseRadius: 14,
       hoverRadius: 36,
-      fillAlpha: 0,
-      hoverAlpha: 0.18,
+      fillAlpha: 0.1,
+      hoverAlpha: 0.3,
       strokeWidth: 1.5,
       scale: 1
     };
@@ -103,53 +58,58 @@
     const dot = {
       x: mouseX,
       y: mouseY,
-      radius: 3,
-      baseRadius: 3,
+      radius: 3.5,
+      baseRadius: 3.5,
       scale: 1
     };
 
-    // Lerp utility matching ReGGae NXqjpo
     function lerp(a, b, n) {
       return (1 - n) * a + n * b;
     }
 
-    // Hover target selector
-    const interactiveSelector = `
-      a, button, [hover-nav-item], [data-hover], .btn-circle, .btn-circle_link,
-      .nav-item, .tab_link, .accordion-item, .cursor-hover, [role="button"],
-      input[type="submit"], input[type="button"], [data-modal-cta-btn],
-      .card_preview, .swiper-button-prev, .swiper-button-next, .lightbox-link,
-      .menu_btn, .nav_item, .footer_link, .brand
-    `.trim();
-
-    // Mouse move
-    window.addEventListener('mousemove', function (e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!isMouseInside) {
-        isMouseInside = true;
-        canvas.classList.add('is-active');
+    function updatePos(x, y) {
+      mouseX = x;
+      mouseY = y;
+      if (!hasMoved) {
+        hasMoved = true;
         circle.x = mouseX;
         circle.y = mouseY;
         dot.x = mouseX;
         dot.y = mouseY;
       }
+    }
+
+    window.addEventListener('mousemove', function (e) {
+      updatePos(e.clientX, e.clientY);
     }, { passive: true });
 
-    // Window leave / enter
-    document.addEventListener('mouseleave', function () {
-      isMouseInside = false;
-      canvas.classList.remove('is-active');
-    });
+    window.addEventListener('pointermove', function (e) {
+      updatePos(e.clientX, e.clientY);
+    }, { passive: true });
 
-    document.addEventListener('mouseenter', function (e) {
-      isMouseInside = true;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      canvas.classList.add('is-active');
-    });
+    window.addEventListener('touchmove', function (e) {
+      if (e.touches && e.touches[0]) {
+        updatePos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
 
-    // Mousedown / Mouseup physical feedback
+    window.addEventListener('touchstart', function (e) {
+      if (e.touches && e.touches[0]) {
+        updatePos(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: true });
+
+    // Interactive element hover selectors
+    const interactiveSelector = [
+      'a', 'button', '[role="button"]', 'input', 'textarea', 'select',
+      '.btn-circle', '.btn-circle_link', '[hover-nav-item]', '[data-hover]',
+      '.nav-item', '.tab_link', '.accordion-item', '.cursor-hover',
+      '[data-modal-cta-btn]', '[data-modal-menu-btn]', '[data-tab-trigger]',
+      '[data-filter-trigger]', '.card_preview', '.swiper-button-prev',
+      '.swiper-button-next', '.lightbox-link', '.menu_btn', '.brand',
+      '.footer_link', '[data-scroll-reveal]', '.loc-path-s_title'
+    ].join(', ');
+
     window.addEventListener('mousedown', function () {
       if (window.gsap) {
         gsap.to(circle, { scale: 0.75, duration: 0.15, ease: 'power2.out', overwrite: 'auto' });
@@ -170,7 +130,6 @@
       }
     });
 
-    // Event delegation for dynamic hover support
     document.addEventListener('mouseover', function (e) {
       const target = e.target.closest(interactiveSelector);
       if (target && !isHovering) {
@@ -179,20 +138,20 @@
           gsap.to(circle, {
             radius: circle.hoverRadius,
             fillAlpha: circle.hoverAlpha,
-            duration: 0.3,
-            ease: 'power2.out',
+            duration: 0.25,
+            ease: 'power1.easeInOut',
             overwrite: 'auto'
           });
           gsap.to(dot, {
-            radius: 2,
-            duration: 0.3,
-            ease: 'power2.out',
+            scale: 0.8,
+            duration: 0.25,
+            ease: 'power1.easeInOut',
             overwrite: 'auto'
           });
         } else {
           circle.radius = circle.hoverRadius;
           circle.fillAlpha = circle.hoverAlpha;
-          dot.radius = 2;
+          dot.scale = 0.8;
         }
       }
     });
@@ -206,81 +165,68 @@
           if (window.gsap) {
             gsap.to(circle, {
               radius: circle.baseRadius,
-              fillAlpha: 0,
-              duration: 0.3,
-              ease: 'power2.out',
+              fillAlpha: 0.1,
+              duration: 0.25,
+              ease: 'power1.easeInOut',
               overwrite: 'auto'
             });
             gsap.to(dot, {
-              radius: dot.baseRadius,
-              duration: 0.3,
-              ease: 'power2.out',
+              scale: 1,
+              duration: 0.25,
+              ease: 'power1.easeInOut',
               overwrite: 'auto'
             });
           } else {
             circle.radius = circle.baseRadius;
-            circle.fillAlpha = 0;
-            dot.radius = dot.baseRadius;
+            circle.fillAlpha = 0.1;
+            dot.scale = 1;
           }
         }
       }
     });
 
-    // Render loop using requestAnimationFrame + lerp
     function render() {
-      // Outer circle follows with 0.22 lerp (signature ReGGae lag)
       circle.x = lerp(circle.x, mouseX, 0.22);
       circle.y = lerp(circle.y, mouseY, 0.22);
 
-      // Inner dot follows tightly (0.85 lerp)
-      dot.x = lerp(dot.x, mouseX, 0.85);
-      dot.y = lerp(dot.y, mouseY, 0.85);
+      dot.x = lerp(dot.x, mouseX, 0.88);
+      dot.y = lerp(dot.y, mouseY, 0.88);
 
-      // Reset transform & clear
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
-      if (isMouseInside) {
-        const curRadius = circle.radius * circle.scale;
+      const curRadius = circle.radius * circle.scale;
 
-        // 1. Outer Concentric Follower Circle
-        if (curRadius > 0.5) {
-          ctx.beginPath();
-          ctx.arc(circle.x, circle.y, curRadius, 0, Math.PI * 2, false);
-
-          if (circle.fillAlpha > 0.001) {
-            ctx.fillStyle = `rgba(255, 255, 255, ${circle.fillAlpha})`;
-            ctx.fill();
-          }
-
-          ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
-          ctx.lineWidth = circle.strokeWidth;
-          ctx.stroke();
-          ctx.closePath();
-        }
-
-        // 2. Inner Center Dot
-        const curDotRadius = dot.radius * dot.scale;
-        if (curDotRadius > 0.5) {
-          ctx.beginPath();
-          ctx.arc(dot.x, dot.y, curDotRadius, 0, Math.PI * 2, false);
-          ctx.fillStyle = '#ffffff';
-          ctx.fill();
-          ctx.closePath();
-        }
+      // 1. Outer Concentric Follower Circle
+      ctx.beginPath();
+      ctx.arc(circle.x, circle.y, Math.max(0.5, curRadius), 0, Math.PI * 2, false);
+      if (circle.fillAlpha > 0.01) {
+        ctx.fillStyle = `rgba(255, 255, 255, ${circle.fillAlpha})`;
+        ctx.fill();
       }
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.lineWidth = circle.strokeWidth;
+      ctx.stroke();
+      ctx.closePath();
+
+      // 2. Inner Center Dot
+      const curDotRadius = dot.radius * dot.scale;
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, Math.max(0.5, curDotRadius), 0, Math.PI * 2, false);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.closePath();
 
       requestAnimationFrame(render);
     }
 
     requestAnimationFrame(render);
-
     window.__reggaeCursor = { circle, dot, render };
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCursor);
+    document.addEventListener('DOMContentLoaded', setupCursor);
   } else {
-    initCursor();
+    setupCursor();
   }
 })();

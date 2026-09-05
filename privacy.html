@@ -11,9 +11,24 @@
     h2 { color: #fff; font-size: 1.2rem; margin-top: 24px; margin-bottom: 8px; }
     p { margin-bottom: 14px; color: #d0d6ca; }
     a.back { display: inline-block; margin-top: 24px; color: #f3f3ec; text-decoration: underline; }
+    #cursor-canvas {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      pointer-events: none !important;
+      z-index: 2147483647 !important;
+      mix-blend-mode: difference !important;
+      display: block !important;
+    }
+    @media (min-width: 769px) {
+      body, a, button { cursor: none !important; }
+    }
   </style>
 </head>
 <body>
+  <canvas id="cursor-canvas" class="reggae-cursor-canvas js-canvas"></canvas>
   <h1>Privacy Policy</h1>
   <p class="sub">Dream Heights (PBRERA-BTI08-PR0949) • Dream Land Promoters, Bathinda</p>
   <p>At <strong>Dream Heights</strong>, we respect your privacy. Any personal information (name, phone number, email address) provided when inquiring about residences on Malout-Badal Ring Road, Bathinda is used exclusively by Dream Land Promoters to schedule site visits and provide project documentation.</p>
