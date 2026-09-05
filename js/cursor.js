@@ -1,7 +1,7 @@
 /**
  * Interactive Canvas Cursor based on ReGGae (Jesper Landberg - NXqjpo)
- * - Inner center dot (tracks mouse pointer)
- * - Outer concentric follower circle with fluid lerp interpolation (0.22)
+ * - Normal state: ONLY the inner dot tracks the pointer
+ * - Hover state: Outer concentric circle smoothly expands (36px) around the dot
  * - mix-blend-mode: difference for automatic high-contrast inversion
  * - Interactive hover expansion on links, buttons, CTAs, and interactive elements
  * - Responsive to mouse, pointer, and touch
@@ -43,18 +43,21 @@
     let hasMoved = false;
     let isHovering = false;
 
+    // Outer concentric circle: 0 in normal state, expands on hover
     const circle = {
       x: mouseX,
       y: mouseY,
-      radius: 14,
-      baseRadius: 14,
+      radius: 0,
+      baseRadius: 0,
       hoverRadius: 36,
-      fillAlpha: 0.1,
-      hoverAlpha: 0.3,
+      fillAlpha: 0,
+      hoverAlpha: 0.22,
       strokeWidth: 1.5,
-      scale: 1
+      scale: 1,
+      opacity: 0
     };
 
+    // Inner dot: always visible in normal state
     const dot = {
       x: mouseX,
       y: mouseY,
@@ -130,6 +133,7 @@
       }
     });
 
+    // Hover triggers: bloom outer concentric circle, contract dot slightly
     document.addEventListener('mouseover', function (e) {
       const target = e.target.closest(interactiveSelector);
       if (target && !isHovering) {
@@ -138,24 +142,27 @@
           gsap.to(circle, {
             radius: circle.hoverRadius,
             fillAlpha: circle.hoverAlpha,
-            duration: 0.25,
-            ease: 'power1.easeInOut',
+            opacity: 1,
+            duration: 0.28,
+            ease: 'power2.out',
             overwrite: 'auto'
           });
           gsap.to(dot, {
             scale: 0.8,
-            duration: 0.25,
-            ease: 'power1.easeInOut',
+            duration: 0.28,
+            ease: 'power2.out',
             overwrite: 'auto'
           });
         } else {
           circle.radius = circle.hoverRadius;
           circle.fillAlpha = circle.hoverAlpha;
+          circle.opacity = 1;
           dot.scale = 0.8;
         }
       }
     });
 
+    // Leave triggers: collapse outer circle back to 0 (only dot remains in normal state)
     document.addEventListener('mouseout', function (e) {
       const target = e.target.closest(interactiveSelector);
       if (target) {
@@ -164,21 +171,23 @@
           isHovering = false;
           if (window.gsap) {
             gsap.to(circle, {
-              radius: circle.baseRadius,
-              fillAlpha: 0.1,
+              radius: 0,
+              fillAlpha: 0,
+              opacity: 0,
               duration: 0.25,
-              ease: 'power1.easeInOut',
+              ease: 'power2.inOut',
               overwrite: 'auto'
             });
             gsap.to(dot, {
               scale: 1,
               duration: 0.25,
-              ease: 'power1.easeInOut',
+              ease: 'power2.out',
               overwrite: 'auto'
             });
           } else {
-            circle.radius = circle.baseRadius;
-            circle.fillAlpha = 0.1;
+            circle.radius = 0;
+            circle.fillAlpha = 0;
+            circle.opacity = 0;
             dot.scale = 1;
           }
         }
@@ -186,36 +195,41 @@
     });
 
     function render() {
+      // Outer circle trails with fluid 0.22 lerp
       circle.x = lerp(circle.x, mouseX, 0.22);
       circle.y = lerp(circle.y, mouseY, 0.22);
 
+      // Inner dot follows tightly
       dot.x = lerp(dot.x, mouseX, 0.88);
       dot.y = lerp(dot.y, mouseY, 0.88);
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
 
+      // 1. Outer Concentric Circle: only rendered when blooming on hover
       const curRadius = circle.radius * circle.scale;
-
-      // 1. Outer Concentric Follower Circle
-      ctx.beginPath();
-      ctx.arc(circle.x, circle.y, Math.max(0.5, curRadius), 0, Math.PI * 2, false);
-      if (circle.fillAlpha > 0.01) {
-        ctx.fillStyle = `rgba(255, 255, 255, ${circle.fillAlpha})`;
-        ctx.fill();
+      if (curRadius > 1 && circle.opacity > 0.01) {
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, curRadius, 0, Math.PI * 2, false);
+        if (circle.fillAlpha > 0.01) {
+          ctx.fillStyle = `rgba(255, 255, 255, ${circle.fillAlpha * circle.opacity})`;
+          ctx.fill();
+        }
+        ctx.strokeStyle = `rgba(255, 255, 255, ${0.95 * circle.opacity})`;
+        ctx.lineWidth = circle.strokeWidth;
+        ctx.stroke();
+        ctx.closePath();
       }
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.95)';
-      ctx.lineWidth = circle.strokeWidth;
-      ctx.stroke();
-      ctx.closePath();
 
-      // 2. Inner Center Dot
+      // 2. Inner Center Dot: ALWAYS present in normal state and hover
       const curDotRadius = dot.radius * dot.scale;
-      ctx.beginPath();
-      ctx.arc(dot.x, dot.y, Math.max(0.5, curDotRadius), 0, Math.PI * 2, false);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
-      ctx.closePath();
+      if (curDotRadius > 0.5) {
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, curDotRadius, 0, Math.PI * 2, false);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+        ctx.closePath();
+      }
 
       requestAnimationFrame(render);
     }
