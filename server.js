@@ -29,6 +29,12 @@ const server = http.createServer((req, res) => {
 
   if (pathname === '/') {
     pathname = '/index.html';
+  } else if (pathname === '/privacy' || pathname === '/privacy.html') {
+    pathname = '/privacy.html';
+  } else if (pathname === '/terms' || pathname === '/terms.html') {
+    pathname = '/terms.html';
+  } else if (!path.extname(pathname)) {
+    pathname = pathname + '.html';
   }
 
   const filePath = path.join(PUBLIC_DIR, pathname);
