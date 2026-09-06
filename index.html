@@ -233,9 +233,16 @@ $$$$$$$$$$                    /////////          �
         z-index: 2147483647 !important;
         mix-blend-mode: difference !important;
         display: block !important;
+        will-change: transform;
+        transform: translateZ(0);
       }
       @media (min-width: 769px) {
-        html, body, a, button, [role="button"], .btn-circle_link {
+        html.has-custom-cursor,
+        html.has-custom-cursor body,
+        html.has-custom-cursor a,
+        html.has-custom-cursor button,
+        html.has-custom-cursor [role="button"],
+        html.has-custom-cursor .btn-circle_link {
           cursor: none !important;
         }
       }

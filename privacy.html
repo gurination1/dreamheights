@@ -21,9 +21,14 @@
       z-index: 2147483647 !important;
       mix-blend-mode: difference !important;
       display: block !important;
+      will-change: transform;
+      transform: translateZ(0);
     }
     @media (min-width: 769px) {
-      body, a, button { cursor: none !important; }
+      html.has-custom-cursor,
+      html.has-custom-cursor body,
+      html.has-custom-cursor a,
+      html.has-custom-cursor button { cursor: none !important; }
     }
   </style>
 </head>
