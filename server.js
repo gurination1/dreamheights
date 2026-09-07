@@ -74,11 +74,16 @@ const server = http.createServer((req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     // Handle range request for video streaming
-    if ((ext === '.mp4' || ext === '.webm') && req.headers.range) {
+    if ((ext === '.mp4' || ext === '.webm') && req.headers.range && stats.size > 0) {
       const range = req.headers.range;
       const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : stats.size - 1;
+      const start = parseInt(parts[0], 10) || 0;
+      const end = parts[1] ? Math.min(parseInt(parts[1], 10), stats.size - 1) : stats.size - 1;
+      if (start > end || start >= stats.size) {
+        res.writeHead(416, { 'Content-Range': `bytes */${stats.size}` });
+        res.end();
+        return;
+      }
       const chunksize = end - start + 1;
 
       res.writeHead(206, {
@@ -91,6 +96,7 @@ const server = http.createServer((req, res) => {
       });
 
       const stream = fs.createReadStream(filePath, { start, end });
+      stream.on('error', () => { res.end(); });
       stream.pipe(res);
       return;
     }
