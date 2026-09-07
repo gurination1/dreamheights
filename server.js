@@ -20,6 +20,7 @@ const MIME_TYPES = {
   '.woff2': 'font/woff2',
   '.ttf': 'font/ttf',
   '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
   '.ico': 'image/x-icon',
 };
 
@@ -55,7 +56,7 @@ const server = http.createServer((req, res) => {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     // Handle range request for video streaming
-    if (ext === '.mp4' && req.headers.range) {
+    if ((ext === '.mp4' || ext === '.webm') && req.headers.range) {
       const range = req.headers.range;
       const parts = range.replace(/bytes=/, '').split('-');
       const start = parseInt(parts[0], 10);
