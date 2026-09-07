@@ -91,7 +91,7 @@ const server = http.createServer((req, res) => {
         'Accept-Ranges': 'bytes',
         'Content-Length': chunksize,
         'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Cache-Control': 'no-cache',
         'Access-Control-Allow-Origin': '*',
       });
 
@@ -102,9 +102,7 @@ const server = http.createServer((req, res) => {
     }
 
     const isHtml = ext === '.html';
-    const cacheControl = isHtml
-      ? 'no-cache'
-      : (STATIC_EXTENSIONS.has(ext) ? 'public, max-age=31536000, immutable' : 'no-cache');
+    const cacheControl = 'no-cache';
 
     const headers = {
       'Content-Type': contentType,
