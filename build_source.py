@@ -5,7 +5,7 @@ with open('/tmp/era_raw.html', 'r', encoding='utf-8') as f:
 
 # 1. Update CSS links to local files and add Google Fonts fallbacks
 head_insert = """
-    <link rel="stylesheet" href="/css/era-residence.css" type="text/css" />
+    <link rel="stylesheet" href="/css/dream-heights.css" type="text/css" />
     <link rel="stylesheet" href="/css/lenis.css" type="text/css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
