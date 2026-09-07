@@ -206,6 +206,7 @@ $$$$$$$$$$                    /////////          �
     "font-size:10px;color: rgb(255, 117, 194);font-family:monospace;"
   )
 </script>
+    <link rel="preload" as="image" href="/images/dreamsquare_hero_1920x1728.jpg" fetchpriority="high" />
     <link rel="stylesheet" href="/css/dream-heights.css" type="text/css" />
     <link rel="stylesheet" href="/css/lenis.css" type="text/css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -232,9 +233,12 @@ $$$$$$$$$$                    /////////          �
         pointer-events: none !important;
         z-index: 2147483647 !important;
         mix-blend-mode: difference !important;
-        display: block !important;
+        display: none !important;
         will-change: transform;
         transform: translateZ(0);
+      }
+      html.has-custom-cursor #cursor-canvas {
+        display: block !important;
       }
       @media (min-width: 769px) {
         html.has-custom-cursor,
@@ -251,7 +255,7 @@ $$$$$$$$$$                    /////////          �
         transform-origin: top left !important;
       }
       .flower.interior .video {
-        transform: translateX(22%) scale(-0.9, 0.9) !important;
+        transform: translateX(-16.25%) scale(-0.9, 0.9) !important;
         transform-origin: center top !important;
       }
     </style>
@@ -780,13 +784,25 @@ $$$$$$$$$$                    /////////          �
     --arch-y: 100vh;
 
     mask-image: linear-gradient(white, white), linear-gradient(white, white), linear-gradient(white, white), url('/images/preloader_arch-l.svg');
+    -webkit-mask-image: linear-gradient(white, white), linear-gradient(white, white), linear-gradient(white, white), url('/images/preloader_arch-l.svg');
     mask-size:
-      calc(50% - (var(--arch-w) / 2) + 2px) 100%,
-      calc(var(--arch-w) + 4px) calc(var(--arch-y) + 2px),
-      calc(50% - (var(--arch-w) / 2) + 2px) 100%,
+      max(0px, calc(50% - (var(--arch-w) / 2) + 2px)) 100%,
+      calc(var(--arch-w) + 4px) max(0px, calc(var(--arch-y) + 2px)),
+      max(0px, calc(50% - (var(--arch-w) / 2) + 2px)) 100%,
+      var(--arch-w) var(--arch-h);
+    -webkit-mask-size:
+      max(0px, calc(50% - (var(--arch-w) / 2) + 2px)) 100%,
+      calc(var(--arch-w) + 4px) max(0px, calc(var(--arch-y) + 2px)),
+      max(0px, calc(50% - (var(--arch-w) / 2) + 2px)) 100%,
       var(--arch-w) var(--arch-h);
     mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
     mask-position:
+      left top,
+      center top,
+      right top,
+      center var(--arch-y);
+    -webkit-mask-position:
       left top,
       center top,
       right top,
@@ -1293,7 +1309,7 @@ $$$$$$$$$$                    /////////          �
     top: 73.2%;
     left: 76.6%;
   }
-</style></div></div></div></div><div data-tab-content="day" class="hero-w_bg_master_img_day"><div data-tab="img" class="img-w h-auto"><img loading="eager" src="/images/dreamsquare_hero_1920x1728.jpg" alt="" sizes="(max-width: 1920px) 100vw, 1920px" srcset="/images/dreamsquare_hero_1920x1728.jpg" class="img h-auto hero-img"/></div></div><div data-tab-content="night" class="hero-w_bg_master_img_night"><div data-tab="img" class="img-w h-auto"><img loading="eager" src="/images/gazebo_night_1920x1728.jpg" alt="" sizes="(max-width: 1920px) 100vw, 1920px" srcset="/images/gazebo_night_1920x1728.jpg" class="img h-auto hero-img"/></div></div><div class="img-over-grad from-top _100vh"></div><div class="img-over-grad from-bot bot _6x"></div><div class="img-over-grad from-bot bot _6x"></div></div><div class="hero-s_b"><div data-prevent-flicker="" data-scroll-reveal="ctn" class="hero-s_btn"><div class="e-auto"><div hover-btn-circle="" data-magnetic-btn="" hover-nav-item-trigger="" class="btn-circle"><div data-magnetic-inner="" class="btn-circle_label"><a hover-nav-item="" aria-label="View available apartments" data-modal-cta-btn="book-a-call" href="#" class="nav-item w-inline-block"><div class="nav-item_label"><div class="nav-item_label_text"><div hover="text" class="l1">View available apartments</div></div><div class="nav-item_label_text is-2"><div hover="text" class="l1">View available apartments</div></div></div></a></div><div class="btn-circle_bg w-embed"><svg data-circle viewBox="0 0 208 208" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+</style></div></div></div></div><div data-tab-content="day" class="hero-w_bg_master_img_day"><div data-tab="img" class="img-w h-auto"><img loading="eager" decoding="async" fetchpriority="high" src="/images/dreamsquare_hero_1920x1728.jpg" alt="" sizes="(max-width: 1920px) 100vw, 1920px" srcset="/images/dreamsquare_hero_1920x1728.jpg" class="img h-auto hero-img"/></div></div><div data-tab-content="night" class="hero-w_bg_master_img_night"><div data-tab="img" class="img-w h-auto"><img loading="eager" src="/images/gazebo_night_1920x1728.jpg" alt="" sizes="(max-width: 1920px) 100vw, 1920px" srcset="/images/gazebo_night_1920x1728.jpg" class="img h-auto hero-img"/></div></div><div class="img-over-grad from-top _100vh"></div><div class="img-over-grad from-bot bot _6x"></div><div class="img-over-grad from-bot bot _6x"></div></div><div class="hero-s_b"><div data-prevent-flicker="" data-scroll-reveal="ctn" class="hero-s_btn"><div class="e-auto"><div hover-btn-circle="" data-magnetic-btn="" hover-nav-item-trigger="" class="btn-circle"><div data-magnetic-inner="" class="btn-circle_label"><a hover-nav-item="" aria-label="View available apartments" data-modal-cta-btn="book-a-call" href="#" class="nav-item w-inline-block"><div class="nav-item_label"><div class="nav-item_label_text"><div hover="text" class="l1">View available apartments</div></div><div class="nav-item_label_text is-2"><div hover="text" class="l1">View available apartments</div></div></div></a></div><div class="btn-circle_bg w-embed"><svg data-circle viewBox="0 0 208 208" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
   <circle data-arc cx="104" cy="104" r="103.5" stroke="currentColor" stroke-width="1" fill="none" transform="rotate(-150 104 104)" />
   <circle data-arc cx="104" cy="104" r="103.5" stroke="currentColor" stroke-width="1" fill="none" transform="rotate(30 104 104)" />
 

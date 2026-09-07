@@ -24,6 +24,24 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
 };
 
+const STATIC_EXTENSIONS = new Set([
+  '.webm',
+  '.mp4',
+  '.png',
+  '.jpg',
+  '.jpeg',
+  '.webp',
+  '.avif',
+  '.woff',
+  '.woff2',
+  '.ttf',
+  '.svg',
+  '.css',
+  '.js',
+  '.ico',
+  '.json',
+]);
+
 const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
@@ -68,6 +86,8 @@ const server = http.createServer((req, res) => {
         'Accept-Ranges': 'bytes',
         'Content-Length': chunksize,
         'Content-Type': contentType,
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Access-Control-Allow-Origin': '*',
       });
 
       const stream = fs.createReadStream(filePath, { start, end });
@@ -75,14 +95,23 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    res.writeHead(200, {
+    const isHtml = ext === '.html';
+    const cacheControl = isHtml
+      ? 'no-cache'
+      : (STATIC_EXTENSIONS.has(ext) ? 'public, max-age=31536000, immutable' : 'no-cache');
+
+    const headers = {
       'Content-Type': contentType,
       'Content-Length': stats.size,
-      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
-      'Pragma': 'no-cache',
-      'Expires': '0',
+      'Cache-Control': cacheControl,
       'Access-Control-Allow-Origin': '*',
-    });
+    };
+
+    if (ext === '.mp4' || ext === '.webm') {
+      headers['Accept-Ranges'] = 'bytes';
+    }
+
+    res.writeHead(200, headers);
 
     const stream = fs.createReadStream(filePath);
     stream.pipe(res);

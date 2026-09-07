@@ -218,13 +218,16 @@
 
     // High-refresh continuous render loop with framerate-independent exponential dampening
     function render(now) {
+      if (!isVisible) {
+        lastTime = now;
+        requestAnimationFrame(render);
+        return;
+      }
       const dt = Math.min((now - lastTime) / 1000, 0.1);
       lastTime = now;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, width, height);
-
-      if (isVisible) {
         // Silky exponential decay dampening
         // 14.0 factor creates the signature fluid Awwwards trailing glide without micro-jitters
         const factor = 1 - Math.exp(-14.0 * dt);
@@ -249,7 +252,6 @@
           ctx.fill();
           ctx.closePath();
         }
-      }
 
       requestAnimationFrame(render);
     }
