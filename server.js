@@ -101,8 +101,8 @@ const server = http.createServer((req, res) => {
       return;
     }
 
-    const isHtml = ext === '.html';
-    const cacheControl = 'no-cache';
+    const isHtml = ext === '.html' || !ext;
+    const cacheControl = isHtml ? 'no-cache' : 'public, max-age=31536000, immutable';
 
     const headers = {
       'Content-Type': contentType,
