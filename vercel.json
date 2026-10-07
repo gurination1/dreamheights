@@ -1,9 +1,6 @@
 {
-  "functions": {
-    "server.js": {
-      "includeFiles": "{index.html,privacy.html,terms.html,css/**,js/**,images/**,videos/**,fonts/**}"
-    }
-  },
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/(.*)\\.(webm|mp4|png|jpg|jpeg|webp|avif|woff|woff2|ttf|svg|css|js)",
@@ -19,7 +16,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "no-cache"
+          "value": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400"
         }
       ]
     }
